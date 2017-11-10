@@ -25,7 +25,7 @@ int main(int argc, char** argv)
     std::string name;
     
     for (int i = 1; i <= size; i++) {
-        name = "Dataset\\spacer-master\\spacer-master\\data\\test\\img\\Baskerville Old Face\\" + to_string(i) + ".png";
+        name = "/Users/malithranathunga/Desktop/Research/Code/Autokern/Autokern/" + to_string(i) + ".png";
         glyphArray[i - 1] = cv::imread(name, 0);          // open image
         threshold(glyphArray[i - 1], glyphArray[i - 1], 150, 255, CV_THRESH_BINARY_INV); // invert colors
         
@@ -43,6 +43,7 @@ int main(int argc, char** argv)
         else {
             imgOriginal = glyphArray[i - 1];
         }
+
         
     }
     
