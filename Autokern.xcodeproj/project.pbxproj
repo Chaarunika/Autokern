@@ -8,6 +8,7 @@
 
 /* Begin PBXBuildFile section */
 		1B6683171F891323004DA855 /* main.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 1B6683161F891323004DA855 /* main.cpp */; };
+		47B7E0101FBC8D2200ABB8CC /* fontSpacerGame.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 47B7E00F1FBC8D2200ABB8CC /* fontSpacerGame.cpp */; };
 		47C6E7811F9C65AA00981B8B /* rewardFunction.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 47C6E7801F9C65AA00981B8B /* rewardFunction.cpp */; };
 /* End PBXBuildFile section */
 
@@ -26,6 +27,7 @@
 /* Begin PBXFileReference section */
 		1B6683131F891323004DA855 /* Autokern */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.executable"; includeInIndex = 0; path = Autokern; sourceTree = BUILT_PRODUCTS_DIR; };
 		1B6683161F891323004DA855 /* main.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = main.cpp; sourceTree = "<group>"; };
+		47B7E00F1FBC8D2200ABB8CC /* fontSpacerGame.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = fontSpacerGame.cpp; sourceTree = "<group>"; };
 		47C6E7801F9C65AA00981B8B /* rewardFunction.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = rewardFunction.cpp; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
@@ -60,6 +62,7 @@
 			isa = PBXGroup;
 			children = (
 				1B6683161F891323004DA855 /* main.cpp */,
+				47B7E00F1FBC8D2200ABB8CC /* fontSpacerGame.cpp */,
 				47C6E7801F9C65AA00981B8B /* rewardFunction.cpp */,
 			);
 			path = Autokern;
@@ -123,6 +126,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				47C6E7811F9C65AA00981B8B /* rewardFunction.cpp in Sources */,
+				47B7E0101FBC8D2200ABB8CC /* fontSpacerGame.cpp in Sources */,
 				1B6683171F891323004DA855 /* main.cpp in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;

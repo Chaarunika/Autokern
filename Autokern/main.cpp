@@ -5,7 +5,7 @@
 //  Created by malith on 10/7/17.
 //  Copyright © 2017 NMR. All rights reserved.
 //
-
+/*
 #include "opencv2/opencv.hpp"
 
 using namespace cv;
@@ -142,3 +142,4 @@ Mat translateImg(Mat &img, int offsetx, int offsety) {
     warpAffine(img, img, trans_mat, img.size(), cv::INTER_CUBIC,cv::BORDER_CONSTANT, cv::Scalar(0, 0, 0, 0));
     return trans_mat;
 }
+*/
