@@ -12,10 +12,10 @@
 using namespace cv;
 using namespace std;
 
-const int alphabetSize = 3;  //should be greater than 2. otherwise fails intializeBaseDistanceArr()
+const int alphabetSize = 11;  //should be greater than 2. otherwise fails intializeBaseDistanceArr()
 int maxWidthArr[alphabetSize];
 int baseDistanceArr[alphabetSize];
-int kernValueArr[alphabetSize-1]={0};
+int kernValueArr[alphabetSize]={0};
 
 cv::Mat glyphMatArr[alphabetSize];
 
@@ -33,9 +33,9 @@ void printGlyph(cv::Mat glyph){
 }
 
 void printStats(){
-    cout << "\nbaseDistanceArr  maxWidthArr\n";
+    cout << "\nbaseDistanceArr  maxWidthArr KernValue\n";
     for(int i=0; i<alphabetSize; i++){
-        cout << baseDistanceArr[i] << "\t\t\t\t\t" << maxWidthArr[i] << endl;
+        cout << baseDistanceArr[i] << "\t\t\t\t\t" << maxWidthArr[i] << "\t\t\t\t\t" <<kernValueArr[i]<< endl;
     }
     
 }
@@ -54,28 +54,12 @@ cv::Mat state(cv::Mat currentState, int action, int glyphID){
     return nextState;
 }
 
-cv::Mat gernerateCurrentState(){
-    cv::Mat currentState = glyphMatArr[0];
-    cv::Mat gapMat;
-    int gapSize;
-    
-    for(int i=1;i<alphabetSize;i++){
-        gapSize = (baseDistanceArr[i] -(baseDistanceArr[i-1] + maxWidthArr[i-1]));
-        gapMat = cv::Mat::zeros(currentState.rows, gapSize,CV_8U);
-        //printGlyph(gapMat);
-        //cout << "DDDD"<< currentState.type()<<endl;
-        cv::hconcat(currentState, gapMat, currentState);
-        cv::hconcat(currentState, glyphMatArr[i], currentState);
-    }
-    stateMat = currentState;
-    return currentState;
-}
-////
+
 cv::Mat gernerateState(){
     cv::Mat currentState = glyphMatArr[0];
     cv::Mat gapMat;
     cv::Mat leftPart,rightPart,commanPart,prevState,temp;
-    kernValueArr[0] = -10;
+    //kernValueArr[0] = -10;
     //kernValueArr[1] = -10;
     for(int i=1;i<alphabetSize;i++){
         if(kernValueArr[i-1]==0){
@@ -94,7 +78,7 @@ cv::Mat gernerateState(){
             leftPart = currentState.colRange((currentState.cols-1)-(kernValueArr[i-1]*-1) , (currentState.cols-1));
             rightPart = glyphMatArr[i].colRange(0, (kernValueArr[i-1]*-1));
             addWeighted( leftPart, 1, rightPart, 1, 0.0, commanPart);
-            printGlyph(commanPart);
+            //printGlyph(commanPart);
             
             leftPart = currentState.colRange(0, (currentState.cols-1)-(kernValueArr[i-1]*-1));
             rightPart = glyphMatArr[i].colRange((kernValueArr[i-1]*-1),glyphMatArr[i].cols-1);
@@ -103,10 +87,23 @@ cv::Mat gernerateState(){
         }
     }
 
-    stateMat = currentState;
     return currentState;
 }
 
+void action(int glyphId, bool direction){
+    if(glyphId > 0 && glyphId<alphabetSize){
+        if(direction){ //true -right
+            kernValueArr[glyphId-1] += 1;
+            baseDistanceArr[glyphId] += 1;
+        }
+        else if(abs(kernValueArr[glyphId-1] )+2 < glyphMatArr[glyphId].cols ){
+            kernValueArr[glyphId-1] -= 1;
+            baseDistanceArr[glyphId] -= 1;
+
+        }
+    }
+}
+/*
 void moveLeft(int glypId){
     cv::Mat leftPart,rightPart,commanPart,prevState,temp;
     
@@ -134,7 +131,7 @@ void moveLeft(int glypId){
     
 }
 
-
+*/
 class Glyph
 {
 private:
@@ -222,7 +219,21 @@ int main(int argc, char** argv)
     }
     intializeBaseDistanceArr();
     printStats();
-    printGlyph(gernerateState());
+    //printGlyph(gernerateState());
     //moveLeft(1);
+    
+    int glyphId;
+    bool direction;
+    
+    for (long double t = 0; t < 1000000000; t++) {
+        glyphId = rand() % alphabetSize;
+        direction = rand() % 2;
+        action(glyphId,direction);
+        cv::imshow("xx", gernerateState());
+        waitKey(1);
+        //printStats();
+        
+    }
+    printStats();
     return 0;
 }
