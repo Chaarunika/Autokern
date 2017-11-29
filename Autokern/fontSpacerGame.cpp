@@ -19,6 +19,11 @@ int kernValueArr[alphabetSize]={0};
 
 cv::Mat glyphMatArr[alphabetSize];
 
+int rewardfunction(cv::Mat state ){
+    int reward=0;
+    
+    return reward;
+}
 
 void printGlyph(cv::Mat glyph){
     
@@ -35,7 +40,7 @@ void printGlyph(cv::Mat glyph){
 void printStats(){
     cout << "\nbaseDistanceArr  maxWidthArr KernValue\n";
     for(int i=0; i<alphabetSize; i++){
-        cout << baseDistanceArr[i] << "\t\t\t\t\t" << maxWidthArr[i] << "\t\t\t\t\t" <<kernValueArr[i]<< endl;
+        cout << baseDistanceArr[i] << "\t\t\t\t\t" << maxWidthArr[i] << "\t\t" <<kernValueArr[i]<< endl;
     }
     
 }
@@ -232,7 +237,8 @@ int main(int argc, char** argv)
         cv::imshow("xx", gernerateState());
         waitKey(1);
         //printStats();
-        
+        printStats();
+
     }
     printStats();
     return 0;
