@@ -17,10 +17,33 @@ int maxWidthArr[alphabetSize];
 int baseDistanceArr[alphabetSize];
 int kernValueArr[alphabetSize]={0};
 
+const int glyphHeight =56;
+int glyphLeftSpaceMap[alphabetSize][glyphHeight];
+int glyphRightSpaceMap[alphabetSize][glyphHeight];
+int spaceMap[alphabetSize][glyphHeight];
+
 cv::Mat glyphMatArr[alphabetSize];
+
+cv::Mat gernerateState();
+void generateSpaceMap();
 
 int rewardfunction(cv::Mat state ){
     int reward=0;
+    int penalty=0;
+    //cv::Mat currentState;
+    
+    generateSpaceMap();
+    for(int i=0;i<alphabetSize;i++){
+        for(int j=0;j<glyphHeight;j++){
+            if(spaceMap[i][j] > 66 || spaceMap[i][j] <0 ){
+                penalty++;
+            }
+        }
+    }
+    reward = reward-penalty;
+    
+    //currentState = gernerateState();
+    
     
     return reward;
 }
@@ -43,6 +66,14 @@ void printStats(){
         cout << baseDistanceArr[i] << "\t\t\t\t\t" << maxWidthArr[i] << "\t\t" <<kernValueArr[i]<< endl;
     }
     
+    cout << "\nSpace Matrix\n";
+    for(int i=0;i<alphabetSize;i++){
+        for(int j=0;j<glyphHeight;j++){
+            //printf("%d ",spaceMap[i][j]);
+        }
+        //printf("\n");
+    }
+    
 }
 
 void intializeBaseDistanceArr(){
@@ -57,6 +88,14 @@ cv::Mat state(cv::Mat currentState, int action, int glyphID){
     cv::Mat nextState;
     
     return nextState;
+}
+
+void generateSpaceMap(){
+    for(int i=0;i<alphabetSize-1;i++){
+        for(int j=0;j<glyphHeight;j++){
+            spaceMap[i][j] = glyphRightSpaceMap[i][j] + glyphLeftSpaceMap[i+1][j] + kernValueArr[i];
+        }
+    }
 }
 
 
@@ -149,7 +188,7 @@ public:
     Glyph()
     {
         
-        cout << "glyphId is: " << glyphId << "\n";
+        //cout << "glyphId is: " << glyphId << "\n";
         id = glyphId;
         glyphId++;
     }
@@ -159,7 +198,7 @@ public:
         //printGlyph (glyphInput);
         int startcol = 0;
         int endcol = glyphInput.cols ;
-        for (int i = 0; i < glyphInput.cols; i++) {
+        for (int i = 0; i < glyphInput.cols; i++) { // clean leftside of the glyph
             int count = 0;
             for (int j = 0; j < glyphInput.rows; j++) {
                 count += (int)glyphInput.at<uchar>(j,i);
@@ -170,7 +209,7 @@ public:
             }
             
         }
-        for (int i = glyphInput.cols -1 ; i >= 0; i--) {
+        for (int i = glyphInput.cols -1 ; i >= 0; i--) { //clean rightside of glyph
             int count = 0;
             for (int j = 0; j < glyphInput.rows; j++) {
                 count += (int)glyphInput.at<uchar>(j,i);
@@ -187,9 +226,49 @@ public:
         maxWidth = endcol - startcol +1;
         maxWidthArr[id] = maxWidth;
         
-        cout << startcol << " " << endcol << " " << maxWidth;
+        //cout << startcol << " " << endcol << " " << maxWidth;
         glyph = glyphInput.colRange(startcol, endcol);
         glyphMatArr[id] = glyph;
+        
+        
+        //calculate spacemaps
+        int distance;
+        //int leftSpaceArr[glyph.rows];
+        for (int i = 0; i < glyph.rows; i++) {
+            distance=0;
+            for (int j = 0; j < glyph.cols; ++j) {
+                if((int)glyph.at<uchar>(i,j) == 255 || j== glyph.cols-1){
+                    if(j== glyph.cols-1){
+                        glyphLeftSpaceMap[id][i] = ++distance;
+                    }
+                    else{
+                        glyphLeftSpaceMap[id][i] = distance;
+                    }
+                    
+                    break;
+                }
+            distance++;
+            }
+        }
+        
+        for (int i = 0; i < glyph.rows; i++) {
+            distance=0;
+            for (int j = glyph.cols-1; j >= 0; j--) {
+                if((int)glyph.at<uchar>(i,j) == 255 || j== 0){
+                    if(j== 0){
+                        glyphRightSpaceMap[id][i] = ++distance;
+                    }
+                    else{
+                        glyphRightSpaceMap[id][i] = distance;
+                    }
+                    
+                    break;
+                }
+                distance++;
+            }
+        }
+        
+        
     }
     
     cv::Mat getGlyphMat(){
@@ -207,7 +286,7 @@ int main(int argc, char** argv)
     
     for (int i = 0; i < alphabetSize; i++) {
         glyphPath = "/Users/malithranathunga/Desktop/Research/Code/Autokern/Autokern/" + to_string(i) + ".png";
-        cout<< glyphPath << "\n";
+        //cout<< glyphPath << "\n";
         glyph = cv::imread(glyphPath,CV_LOAD_IMAGE_GRAYSCALE);
 
         threshold(glyph, glyph, 127, 255, CV_THRESH_BINARY_INV); // invert colors
@@ -223,23 +302,37 @@ int main(int argc, char** argv)
         
     }
     intializeBaseDistanceArr();
+    generateSpaceMap();
     printStats();
     //printGlyph(gernerateState());
     //moveLeft(1);
     
+  
     int glyphId;
     bool direction;
+    int reward;
     
     for (long double t = 0; t < 1000000000; t++) {
         glyphId = rand() % alphabetSize;
         direction = rand() % 2;
+        //glyphId =3;
         action(glyphId,direction);
+        
+        reward = rewardfunction(gernerateState());
+        if(reward<0){
+            action(glyphId,!direction);
+        }
+        
         cv::imshow("xx", gernerateState());
         waitKey(1);
-        //printStats();
         printStats();
+        
+        //cout << rewardfunction(gernerateState()) <<endl;
 
     }
-    printStats();
+   
+
+    //printGlyph(glyphMatArr[0]);
+    //printStats();
     return 0;
 }
